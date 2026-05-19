@@ -1,7 +1,14 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-
-  const { message } = req.body;
+  
+  let body = '';
+  if (typeof req.body === 'string') {
+    body = JSON.parse(req.body);
+  } else {
+    body = req.body;
+  }
+  
+  const message = body.message;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -19,5 +26,5 @@ export default async function handler(req, res) {
   });
 
   const data = await response.json();
-  res.json({ reply: data.content[0].text });
+  res.status(200).json({ reply: data.content[0].text });
 }
